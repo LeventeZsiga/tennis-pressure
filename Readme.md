@@ -52,5 +52,4 @@ tennis-pressure/
 
 Status
 ------
-Score and serve state feature engineering completed.
-Pressure feature construction in progress.
+Data prepocessing and validation complete.
