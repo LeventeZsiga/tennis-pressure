@@ -70,7 +70,8 @@ tennis-pressure/
 5. Add serve state features
 6. (Upcoming) Add pressure / critical point features
 7. Save intermediate datasets to data_processed
-8. 
+8. Final dataset construction
+The final point-level dataset combines all engineered features and serves as input to the probabilistic (Markov) model.
 
 
 - Raw data files are not modified in place
