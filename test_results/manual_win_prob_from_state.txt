@@ -1,0 +1,42 @@
+========================================================================
+1) Start of match (0-0, 0-0, 0-0) with P1 serving
+Serve probs: p_srv1=0.620, p_srv2=0.600
+State: sets=0-0, games=0-0, pts=0-0, server=P1, in_tb=False, tb_pts=0-0
+-> P(P1 wins match | state) = 0.601242
+-> P(P2 wins match | state) = 0.398758
+========================================================================
+2) 1st set 3-3, deuce, P1 serving
+Serve probs: p_srv1=0.620, p_srv2=0.600
+State: sets=0-0, games=3-3, pts=3-3, server=P1, in_tb=False, tb_pts=0-0
+-> P(P1 wins match | state) = 0.583128
+-> P(P2 wins match | state) = 0.416872
+========================================================================
+3) 1st set 3-3, deuce, P2 serving
+Serve probs: p_srv1=0.620, p_srv2=0.600
+State: sets=0-0, games=3-3, pts=3-3, server=P2, in_tb=False, tb_pts=0-0
+-> P(P1 wins match | state) = 0.601550
+-> P(P2 wins match | state) = 0.398450
+========================================================================
+4) P1 up 1 set, 5-4, 40-15 on serve (close to winning match)
+Serve probs: p_srv1=0.620, p_srv2=0.600
+State: sets=1-0, games=5-4, pts=3-1, server=P1, in_tb=False, tb_pts=0-0
+-> P(P1 wins match | state) = 0.992172
+-> P(P2 wins match | state) = 0.007828
+========================================================================
+5) P1 down 0-1 sets, 4-5, facing break point (30-40) on serve
+Serve probs: p_srv1=0.620, p_srv2=0.600
+State: sets=0-1, games=4-5, pts=2-3, server=P1, in_tb=False, tb_pts=0-0
+-> P(P1 wins match | state) = 0.138359
+-> P(P2 wins match | state) = 0.861641
+========================================================================
+6) 1st set tiebreak (6-6), TB 3-3, P1 to serve
+Serve probs: p_srv1=0.620, p_srv2=0.600
+State: sets=0-0, games=6-6, pts=0-0, server=P1, in_tb=True, tb_pts=3-3
+-> P(P1 wins match | state) = 0.580611
+-> P(P2 wins match | state) = 0.419389
+========================================================================
+7) Start of match but P2 has stronger serve (should favor P2)
+Serve probs: p_srv1=0.580, p_srv2=0.660
+State: sets=0-0, games=0-0, pts=0-0, server=P1, in_tb=False, tb_pts=0-0
+-> P(P1 wins match | state) = 0.154908
+-> P(P2 wins match | state) = 0.845092
