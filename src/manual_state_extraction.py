@@ -40,10 +40,9 @@ def tb_start_server_from_current(server_now: int, points_played: int) -> int:
         return 3 - server_now
     return server_now
 
-
 def extract_state(row: pd.Series) -> ModelState:
     in_tb = bool(row["tiebreak"])
-    pw = int(row["PointWinner"])  # 1 or 2
+    pw = int(row["PointWinner"])
 
     sets1 = int(row["P1SetsWon_upto"])
     sets2 = int(row["P2SetsWon_upto"])

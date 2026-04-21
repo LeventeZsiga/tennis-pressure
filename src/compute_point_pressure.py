@@ -29,14 +29,11 @@ def compute_pressure_for_match(m: pd.DataFrame) -> pd.DataFrame:
 
         state = extract_state(row_series)
 
-        # current win probability
         W_before = win_prob_from_state(state, p_srv1, p_srv2)
 
-        # hypothetical next states
         s_win = apply_point(state, True)
         s_lose = apply_point(state, False)
 
-        # hypothetical next win probabilities
         W_win = win_prob_from_state(s_win, p_srv1, p_srv2)
         W_lose = win_prob_from_state(s_lose, p_srv1, p_srv2)
 

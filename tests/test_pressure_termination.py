@@ -23,7 +23,7 @@ import pandas as pd
 # Project imports (must be runnable from project root with `python -m ...`)
 from src.model_state import ModelState
 from src.markov_from_state import win_prob_from_state
-from src.XX_manual_state_extraction import apply_point, compute_match_serve_probs, extract_state
+from src.manual_state_extraction import apply_point, compute_match_serve_probs, extract_state
 
 
 @dataclass

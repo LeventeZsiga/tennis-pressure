@@ -15,10 +15,6 @@ def approx(a, b, tol=TOL):
     return abs(a - b) < tol
 
 
-# -------------------------------------------------
-# 1) Start of match should equal Phase 1 model
-# -------------------------------------------------
-
 def test_start_of_match_matches_phase1():
     p1, p2 = 0.62, 0.60
 
@@ -35,10 +31,6 @@ def test_start_of_match_matches_phase1():
 
     assert approx(w_state, w_phase1)
 
-
-# -------------------------------------------------
-# 2) Match already finished
-# -------------------------------------------------
 
 def test_match_already_won():
     state = ModelState(
@@ -62,10 +54,6 @@ def test_match_already_lost():
     assert win_prob_from_state(state, 0.6, 0.6) == 0.0
 
 
-# -------------------------------------------------
-# 3) Symmetry check (identical serve strength)
-# -------------------------------------------------
-
 def test_symmetry_equal_players():
     state = ModelState(
         sets1=0, sets2=0,
@@ -79,12 +67,7 @@ def test_symmetry_equal_players():
     assert approx(w, 0.5)
 
 
-# -------------------------------------------------
-# 4) Near-certain win / loss states
-# -------------------------------------------------
-
 def test_almost_certain_win():
-    # P1 up 1 set, 5-0, 40-0 on serve
     state = ModelState(
         sets1=1, sets2=0,
         games1=5, games2=0,
@@ -98,7 +81,6 @@ def test_almost_certain_win():
 
 
 def test_almost_certain_loss():
-    # P1 down 1 set, 0-5, 0-40 with opponent serving
     state = ModelState(
         sets1=0, sets2=1,
         games1=0, games2=5,
@@ -111,16 +93,11 @@ def test_almost_certain_loss():
     assert w < 0.05
 
 
-# -------------------------------------------------
-# 5) Tiebreak sanity check
-# -------------------------------------------------
-
 def test_tiebreak_mid_state_sanity():
-    # 6-6 in games, 3-3 in tiebreak, P1 serving
     state = ModelState(
         sets1=0, sets2=0,
         games1=6, games2=6,
-        pts1=0, pts2=0,      # ignored in TB
+        pts1=0, pts2=0,
         server=1,
         in_tb=True,
         tb1=3,
@@ -129,5 +106,4 @@ def test_tiebreak_mid_state_sanity():
 
     w = win_prob_from_state(state, 0.62, 0.60)
 
-    # should be between 0 and 1 and not explode
     assert 0.0 < w < 1.0
