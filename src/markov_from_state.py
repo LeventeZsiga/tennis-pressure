@@ -16,14 +16,6 @@ from .markov_core import (
 )
 
 def win_prob_from_state(state: ModelState, p_srv1: float, p_srv2: float) -> float:
-    """
-    Returns P(P1 wins match | current state), best-of-3 sets, TB at 6-6.
-
-    Requirements:
-      - prob_p1_wins_game_from_points(p_point_win_p1, pts1, pts2) exists
-      - hold_prob_from_point_prob(p) exists
-      - tb_win_prob_from_state(p_srv1, p_srv2, start_server, tb1, tb2) exists
-    """
 
     if state.server not in (1, 2):
         raise ValueError("Invalid server value: {}".format(state.server))
@@ -40,10 +32,6 @@ def win_prob_from_state(state: ModelState, p_srv1: float, p_srv2: float) -> floa
     
     @lru_cache(maxsize=None)
     def set_outcome_dist_from_games(g1: int, g2: int, next_server: int) -> dict:
-        """
-        Distribution over outcomes of the CURRENT set starting from (g1,g2,next_server).
-        Returns dict {(winner, next_set_first_server): prob}.
-        """
         if(g1 >= 6 or g2 >= 6) and abs(g1 - g2) >= 2:
             winner = 1 if g1 > g2 else 2
             return {(winner, next_server): 1.0}

@@ -13,19 +13,16 @@ def approx(a, b, tol=TOL):
 
 
 def test_extreme_probabilities():
-    # p=1 => P1 wins from any non-finished state
     assert approx(prob_p1_wins_game_from_points(1.0, 0, 0), 1.0)
-    assert approx(prob_p1_wins_game_from_points(1.0, 3, 3), 1.0)  # deuce
-    assert approx(prob_p1_wins_game_from_points(1.0, 0, 3), 1.0)  # down 0-40, still wins
+    assert approx(prob_p1_wins_game_from_points(1.0, 3, 3), 1.0)  
+    assert approx(prob_p1_wins_game_from_points(1.0, 0, 3), 1.0)
 
-    # p=0 => P1 loses from any non-finished state
     assert approx(prob_p1_wins_game_from_points(0.0, 0, 0), 0.0)
     assert approx(prob_p1_wins_game_from_points(0.0, 3, 3), 0.0)
     assert approx(prob_p1_wins_game_from_points(0.0, 3, 0), 0.0)
 
 
 def test_terminal_states():
-    # Already over: should return hard 0/1
     assert approx(prob_p1_wins_game_from_points(0.37, 4, 0), 1.0)
     assert approx(prob_p1_wins_game_from_points(0.37, 0, 4), 0.0)
     assert approx(prob_p1_wins_game_from_points(0.37, 5, 3), 1.0)
@@ -33,7 +30,6 @@ def test_terminal_states():
 
 
 def test_deuce_closed_form():
-    # From deuce: p^2 / (p^2 + (1-p)^2)
     for p in [0.2, 0.35, 0.5, 0.62, 0.8]:
         q = 1.0 - p
         expected = (p * p) / (p * p + q * q)
@@ -42,9 +38,6 @@ def test_deuce_closed_form():
 
 
 def test_advantage_relations():
-    # At advantage states, should satisfy simple one-step relations:
-    # Adv P1: W = p*1 + (1-p)*W(deuce)
-    # Adv P2: W = p*W(deuce) + (1-p)*0
     for p in [0.25, 0.5, 0.7]:
         q = 1.0 - p
         deuce = prob_p1_wins_game_from_points(p, 3, 3)
@@ -59,7 +52,6 @@ def test_advantage_relations():
 
 
 def test_monotonicity_in_p():
-    # For any fixed state, increasing p should not decrease win probability.
     states = [(0, 0), (1, 0), (0, 1), (3, 2), (2, 3), (3, 3), (4, 3), (3, 4)]
     ps = [0.1, 0.3, 0.5, 0.7, 0.9]
 
@@ -73,8 +65,6 @@ def test_monotonicity_in_p():
 
 
 def test_bellman_consistency_local():
-    # For any non-terminal (a,b): W(a,b) = p*W(a+1,b) + (1-p)*W(a,b+1)
-    # This is the defining Markov/Bellman equation.
     def is_terminal(a, b):
         return (a >= 4 or b >= 4) and abs(a - b) >= 2
 

@@ -1,15 +1,3 @@
-"""
-tests/test_pressure_termination.py
-
-Quick termination + sanity validation for pressure calculations on random matches.
-
-Run from project root, e.g.:
-  python -m tests.test_pressure_termination --data data_processed/05_final_filtered_adv_matches.parquet --n 50 --seed 123
-
-Or with pytest (optional):
-  pytest -q tests/test_pressure_termination.py
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -36,35 +24,23 @@ class ValidationResult:
 
 
 def validate_match_pressure(df: pd.DataFrame, match_id: str, eps: float = 1e-12) -> ValidationResult:
-    """
-    Validate that for a given match_id we can compute:
-      W_before, W_win, W_lose, pressure = W_win - W_lose
-    across all real points, without crashing, and with basic invariants.
-
-    Returns ValidationResult(ok=True) if it terminates cleanly, otherwise ok=False
-    plus error info.
-    """
     try:
         m = df[df["match_id"] == match_id].copy()
         if m.empty:
             return ValidationResult(match_id=match_id, ok=False, error_type="EmptyMatch", error_msg="match_id not found")
 
-        # keep only real points (filters out PointServer==0 placeholder rows)
         m = m[m["PointServer"].isin([1, 2])].copy()
         if m.empty:
             return ValidationResult(match_id=match_id, ok=False, error_type="NoRealPoints", error_msg="no PointServer in {1,2}")
 
         m = m.sort_values(["SetNo", "GameNo", "PointNumber"]).reset_index(drop=True)
 
-        # Full-match serve probs
         p_srv1, p_srv2 = compute_match_serve_probs(m)
 
         for row in m.itertuples(index=False):
             rowd: Dict[str, Any] = row._asdict()
             s: ModelState = extract_state(pd.Series(rowd))
 
-            # If match is already decided before this row (can happen due to post-event counters),
-            # skip evaluating pressure because the definition is meaningless there.
             if s.sets1 >= 2 or s.sets2 >= 2:
                 continue
 
@@ -76,7 +52,7 @@ def validate_match_pressure(df: pd.DataFrame, match_id: str, eps: float = 1e-12)
             W_win = win_prob_from_state(s_win, p_srv1, p_srv2)
             W_lose = win_prob_from_state(s_lose, p_srv1, p_srv2)
 
-            # Probabilities must be in [0, 1]
+           
             if not (0.0 - eps <= W_before <= 1.0 + eps):
                 return ValidationResult(
                     match_id=match_id,
@@ -102,7 +78,6 @@ def validate_match_pressure(df: pd.DataFrame, match_id: str, eps: float = 1e-12)
                     context=f"SetNo={rowd.get('SetNo')} GameNo={rowd.get('GameNo')} PointNumber={rowd.get('PointNumber')} state={s}",
                 )
 
-            # Monotonicity: winning the point should not reduce match win probability
             if W_win + eps < W_lose:
                 return ValidationResult(
                     match_id=match_id,
@@ -121,9 +96,6 @@ def validate_match_pressure(df: pd.DataFrame, match_id: str, eps: float = 1e-12)
 
 
 def validate_random_matches(df: pd.DataFrame, n: int = 50, seed: int = 42) -> pd.DataFrame:
-    """
-    Sample n match_ids and validate each. Returns a DataFrame of results.
-    """
     rng = random.Random(seed)
     match_ids = df["match_id"].dropna().unique().tolist()
     if not match_ids:
@@ -149,7 +121,6 @@ def validate_random_matches(df: pd.DataFrame, n: int = 50, seed: int = 42) -> pd
 
 
 def _default_data_path() -> Path:
-    # Expect running from project root with `python -m tests.test_pressure_termination`
     root = Path.cwd()
     return root / "data_processed" / "05_final_filtered_adv_matches.parquet"
 
@@ -188,11 +159,7 @@ if __name__ == "__main__":
     main()
 
 
-# Optional: pytest entry point
 def test_random_matches_termination_smoke():
-    """
-    A lightweight pytest test (kept small so CI doesn't take forever).
-    """
     df = pd.read_parquet(_default_data_path())
     results = validate_random_matches(df, n=10, seed=123)
     assert results["ok"].all(), f"Some matches failed:\n{results[results['ok'] == False]}"

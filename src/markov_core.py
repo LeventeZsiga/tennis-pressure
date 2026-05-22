@@ -5,7 +5,6 @@ import numpy as np
 
 
 def prob_p1_wins_game_from_points(p_point_win_p1: float, pts1: int, pts2: int) -> float:
-    """P(P1 wins game) given p=P(P1 wins point on serve) and current score (pts1, pts2)."""
     p = float(p_point_win_p1)
     if not (0.0 <= p <= 1.0):
         raise ValueError("p_point_win_p1 must be in [0,1]") 
@@ -42,7 +41,6 @@ def prob_p1_wins_game_from_points(p_point_win_p1: float, pts1: int, pts2: int) -
         
 
 def hold_prob_from_point_prob(p: float) -> float:
-    """P(server holds a standard advantage game) given p=P(win point on serve)."""
     if p <= 0.0:
         return 0.0
     if p >= 1.0:
@@ -63,13 +61,6 @@ def hold_prob_from_point_prob(p: float) -> float:
 
 
 def tb_server(start_server: int, i: int) -> int:
-    """
-    Standard TB serving:
-      i=0: start_server
-      i=1,2: other
-      i=3,4: start
-      i=5,6: other ...
-    """
     if i == 0:
         return start_server
     block = (i - 1) // 2
@@ -77,16 +68,10 @@ def tb_server(start_server: int, i: int) -> int:
 
 
 def p1_point_win_prob(p_srv1: float, p_srv2: float, server: int) -> float:
-    """P(P1 wins a point) given who serves."""
     return p_srv1 if server == 1 else (1.0 - p_srv2)
 
 
 def tb_win_prob_deuce_region(p_srv1: float, p_srv2: float, start_server: int, i_mod4_start: int) -> float:
-    """
-    Compute P1 win probability from tiebreak 'deuce region' where both >=6.
-    State is (diff, phase) where diff in {-1,0,1} and phase = i mod 4.
-    Absorb when diff hits +2 (P1 wins) or -2 (P1 loses).
-    """
     diffs = [-1, 0, 1]
     phases = [0, 1, 2, 3]
     idx = {(d, ph): k for k, (d, ph) in enumerate((d, ph) for d in diffs for ph in phases)}
@@ -122,11 +107,6 @@ def tb_win_prob_deuce_region(p_srv1: float, p_srv2: float, start_server: int, i_
 
 @lru_cache(maxsize=None)
 def tb_win_prob(p_srv1: float, p_srv2: float, start_server: int) -> float:
-    """
-    Full P(P1 wins tiebreak) with win-by-2, using:
-      - exact DP for scores where not both >=6
-      - finite linear-system solution in the (>=6,>=6) region
-    """
     @lru_cache(maxsize=None)
     def F(a: int, b: int) -> float:
         if (a >= 7 or b >= 7) and abs(a - b) >= 2:
@@ -156,15 +136,6 @@ def tb_win_prob(p_srv1: float, p_srv2: float, start_server: int) -> float:
     return F(0, 0)
 
 def tb_win_prob_from_state(p_srv1: float, p_srv2: float, start_server: int, a0: int, b0: int) -> float:
-    """
-    P(P1 wins tiebreak) from an intermediate tiebreak score (a0, b0),
-    where a0=points won by P1 in TB, b0=points won by P2 in TB.
-
-    Uses:
-      - terminal condition if already decided
-      - deuce-region linear system when both >=6
-      - otherwise finite DP forward
-    """
     a0 = int(a0)
     b0 = int(b0)
     if a0 < 0 or b0 < 0:
@@ -208,16 +179,6 @@ def tb_win_prob_from_state(p_srv1: float, p_srv2: float, start_server: int, a0: 
     return F(a0, b0)
 
 def set_outcome_distribution(p_srv1: float, p_srv2: float, first_server: int):
-    """
-    Returns a dict:
-      { (winner, next_server_after_set): probability }
-    where winner is 1 for P1, 2 for P2.
-
-    Exact game-level model:
-      - hold probs computed from point probs
-      - games alternate serve
-      - TB at 6-6 (TB counts as a game for serve alternation)
-    """
     hold1 = hold_prob_from_point_prob(p_srv1)
     hold2 = hold_prob_from_point_prob(p_srv2)
 
@@ -250,12 +211,6 @@ def set_outcome_distribution(p_srv1: float, p_srv2: float, first_server: int):
 
 
 def match_win_prob_best_of_3(p_srv1: float, p_srv2: float, first_server: int | None = None) -> float:
-    """
-    Standalone Phase 1 model:
-      - input: point win prob on serve for each player
-      - output: P1 match win probability (best-of-3)
-      - exact propagation of server across sets using set_outcome_distribution
-    """
     if not (0.0 <= p_srv1 <= 1.0 and 0.0 <= p_srv2 <= 1.0):
         raise ValueError("Probabilities must be in [0,1].")
     if first_server is not None and first_server not in (1, 2):
